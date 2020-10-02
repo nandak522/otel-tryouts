@@ -29,6 +29,6 @@ WORKDIR /app
 USER ${USER}:${USER}
 COPY --from=builder /app/frontend-server .
 ENV USER=appuser \
-    APP_PORT=8001
+    APP_PORT=8000
 EXPOSE ${APP_PORT}
 CMD ["/app/frontend-server"]

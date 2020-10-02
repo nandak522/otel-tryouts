@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	defaultPort := "8002"
+	defaultPort := "8001"
 	var port string
 	flag.StringVarP(&port, "port", "p", defaultPort, "Port. Defaults to "+defaultPort)
 	var printHelp bool

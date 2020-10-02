@@ -20,5 +20,6 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 		handleErrorResponse(w, errors.New("msg couldn't be saved. Reason:"+err.Error()))
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, string(data))
 }

@@ -1,0 +1,75 @@
+version: "3"
+services:
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    image: local/twitter-frontend:v0.1.0
+    network_mode: host
+    ports:
+      - 8000:8000
+    expose:
+      - "8000"
+    depends_on:
+      - backend-tweets
+      - backend-notifications
+
+  backend-tweets:
+    build:
+      context: backend-tweets
+      dockerfile: Dockerfile
+    image: local/twitter-backend-tweets:v0.1.0
+    network_mode: host
+    ports:
+      - 8001:8001
+    expose:
+      - "8001"
+    # depends_on:
+    #   - backend-tweets-mysql
+
+  # backend-tweets-mysql:
+  #   build:
+  #     context: backend-tweets/mysql
+  #   image: mysql/mysql-server:5.7
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: toor
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: toor
+  #     MYSQL_DATABASE: tweets
+  #   volumes:
+  #     - tweets-mysql-data-volume:/var/lib/mysql
+  #     - ./my.cnf:/etc/my.cnf
+  #   ports:
+  #     - 3306:3306
+
+  backend-notifications:
+    build:
+      context: backend-notifications
+      dockerfile: Dockerfile
+    image: local/twitter-backend-notifications:v0.1.0
+    network_mode: host
+    ports:
+      - 8002:8002
+    expose:
+      - "8002"
+    # depends_on:
+    #   - kend-notifications-mysql
+
+  # backend-notifications-mysql:
+  #   build:
+  #     context: backend-notifications/mysql
+  #   image: mysql/mysql-server:5.7
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: toor
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: toor
+  #     MYSQL_DATABASE: notifications
+  #   volumes:
+  #     - notifications-mysql-data-volume:/var/lib/mysql
+  #     - ./my.cnf:/etc/my.cnf
+  #   ports:
+  #     - 3306:3306
+
+# volumes:
+#   tweets-mysql-data-volume:
+#   notifications-mysql-data-volume:

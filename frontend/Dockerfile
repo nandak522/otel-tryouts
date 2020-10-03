@@ -25,6 +25,7 @@ RUN cd /app \
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
 WORKDIR /app
 USER ${USER}:${USER}
 COPY --from=builder /app/frontend-server .

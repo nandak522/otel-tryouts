@@ -51,8 +51,7 @@ func main() {
 		app, _ := newrelic.NewApplication(
 			newrelic.ConfigAppName(newrelicAPM),
 			newrelic.ConfigLicense(newrelicLicenseKey),
-			// add debug level logging to stdout
-			newrelic.ConfigDebugLogger(os.Stdout),
+			// newrelic.ConfigDebugLogger(os.Stdout), // Only when debugging a problem
 		)
 		log.Info("Newrelic Monitoring is enabled. Posting to ", newrelicAPM, " APM")
 		http.HandleFunc(newrelic.WrapHandleFunc(app, "/", homepage))

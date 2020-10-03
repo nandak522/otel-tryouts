@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/newrelic/go-agent/v3/newrelic"
 	assembler "github.com/none-da/otel-tryouts/frontend/pkg/assembler"
 )
 
@@ -15,7 +16,10 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 }
 
 func homepage(w http.ResponseWriter, r *http.Request) {
-	data, err := json.Marshal(assembler.GetData())
+	txn := newrelic.FromContext(r.Context())
+	defer txn.End()
+
+	data, err := json.Marshal(assembler.GetData(txn))
 	if err != nil {
 		handleErrorResponse(w, errors.New("msg couldn't be saved. Reason:"+err.Error()))
 		return

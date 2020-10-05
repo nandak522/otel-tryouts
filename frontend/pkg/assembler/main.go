@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/newrelic/go-agent/v3/newrelic"
+	apm "github.com/newrelic/go-agent/v3/newrelic"
 )
 
 func getTweets() string {
@@ -37,16 +37,16 @@ func getNotifications() string {
 }
 
 // GetData ...
-func GetData(txn *newrelic.Transaction) map[string]string {
+func GetData(txn *apm.Transaction) map[string]string {
 	data := make(map[string]string)
 
-	getTweetsSegment := newrelic.Segment{}
+	getTweetsSegment := apm.Segment{}
 	getTweetsSegment.Name = "getTweets"
 	getTweetsSegment.StartTime = txn.StartSegmentNow()
 	data["tweets"] = getTweets()
 	getTweetsSegment.End()
 
-	getNotificationsSegment := newrelic.Segment{}
+	getNotificationsSegment := apm.Segment{}
 	getNotificationsSegment.Name = "getNotifications"
 	getNotificationsSegment.StartTime = txn.StartSegmentNow()
 	data["notifications"] = getNotifications()

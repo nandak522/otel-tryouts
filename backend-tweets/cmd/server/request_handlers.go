@@ -30,7 +30,7 @@ func getTweets(w http.ResponseWriter, r *http.Request) {
 	tracer := global.Tracer("tweets")
 	_, span := tracer.Start(
 		r.Context(),
-		"tweets",
+		"/",
 		trace.WithAttributes(attrs...),
 	)
 	defer span.End()

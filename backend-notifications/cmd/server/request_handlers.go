@@ -30,7 +30,7 @@ func getNotifications(w http.ResponseWriter, r *http.Request) {
 	tracer := global.Tracer("notifications")
 	_, span := tracer.Start(
 		r.Context(),
-		"notifications",
+		"/",
 		trace.WithAttributes(attrs...),
 	)
 	defer span.End()

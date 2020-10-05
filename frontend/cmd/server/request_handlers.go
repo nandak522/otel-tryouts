@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/newrelic/go-agent/v3/newrelic"
+	apm "github.com/newrelic/go-agent/v3/newrelic"
 	assembler "github.com/none-da/otel-tryouts/frontend/pkg/assembler"
 	"go.opentelemetry.io/otel/api/global"
 )
@@ -17,7 +17,7 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 }
 
 func homepage(w http.ResponseWriter, r *http.Request) {
-	txn := newrelic.FromContext(r.Context())
+	txn := apm.FromContext(r.Context())
 	defer txn.End()
 
 	tracer := global.Tracer("homepage-tracer")

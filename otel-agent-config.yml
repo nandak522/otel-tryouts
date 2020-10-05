@@ -1,5 +1,0 @@
-exporters:
-  logging:
-    logLevel: debug
-  jaeger:
-    wait_for_ready: true

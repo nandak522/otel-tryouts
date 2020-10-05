@@ -27,11 +27,9 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 	var notifications string
 	tracer := global.Tracer("frontend")
 	rootSpanContext, rootSpan := tracer.Start(requestContext, "/homepage")
-
-	tweetsSpanContext, tweetsSpan := tracer.Start(rootSpanContext, "/tweets")
 	req, _ := http.NewRequest("GET", "http://localhost:8001", nil)
-	_, req = otelhttptrace.W3C(tweetsSpanContext, req)
-	otelhttptrace.Inject(tweetsSpanContext, req)
+	otelhttptrace.Inject(rootSpanContext, req)
+
 	tweetsResponse, err := frontEndClient.Do(req)
 	if err != nil {
 		fmt.Println("Error from Tweets Service")
@@ -43,13 +41,9 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error in reading tweetsResponse.Body")
 	}
 	tweets = string(body)
-	// tweetsSpan.SetStatus(codes.OK, "Tweets concluded")
-	tweetsSpan.End()
 
-	notificationsSpanContext, notificationsSpan := tracer.Start(rootSpanContext, "/notifications")
 	req, _ = http.NewRequest("GET", "http://localhost:8002", nil)
-	_, req = otelhttptrace.W3C(notificationsSpanContext, req)
-	otelhttptrace.Inject(notificationsSpanContext, req)
+	otelhttptrace.Inject(rootSpanContext, req)
 	notificationsResponse, err := frontEndClient.Do(req)
 	if err != nil {
 		fmt.Println("Error from Notifications Service")
@@ -61,8 +55,6 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error in reading notificationsResponse.Body")
 	}
 	notifications = string(body)
-	// notificationsSpan.SetStatus(codes.OK, "Notifications concluded")
-	notificationsSpan.End()
 
 	rootSpan.End()
 

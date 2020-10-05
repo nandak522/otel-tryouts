@@ -7,7 +7,10 @@ import (
 	"net/http"
 
 	"github.com/none-da/otel-tryouts/backend-notifications/pkg/notifications"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
+	"go.opentelemetry.io/otel/api/baggage"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/api/trace"
 )
 
 func handleErrorResponse(w http.ResponseWriter, err error) {
@@ -16,14 +19,26 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 }
 
 func getNotifications(w http.ResponseWriter, r *http.Request) {
-	tracer := global.Tracer("notifications")
 	requestContext := r.Context()
-	_, rootSpan := tracer.Start(requestContext, "/notifications")
+	attrs, entries, spanCtx := otelhttptrace.Extract(requestContext, r)
+	if spanCtx.IsValid() {
+		requestContext = trace.ContextWithRemoteSpanContext(requestContext, spanCtx)
+	}
+	r = r.WithContext(baggage.ContextWithMap(requestContext, baggage.NewMap(baggage.MapUpdate{
+		MultiKV: entries,
+	})))
+	tracer := global.Tracer("notifications")
+	_, span := tracer.Start(
+		r.Context(),
+		"notifications",
+		trace.WithAttributes(attrs...),
+	)
+	defer span.End()
+
 	notificationsJSON, err := json.Marshal(notifications.GetNotifications())
 	if err != nil {
 		handleErrorResponse(w, errors.New("Error! Notifications can't be retrieved"))
 		return
 	}
 	fmt.Fprintf(w, string(notificationsJSON))
-	rootSpan.End()
 }

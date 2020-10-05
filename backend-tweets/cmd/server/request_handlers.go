@@ -7,7 +7,10 @@ import (
 	"net/http"
 
 	"github.com/none-da/otel-tryouts/backend-tweets/pkg/tweets"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
+	"go.opentelemetry.io/otel/api/baggage"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/api/trace"
 )
 
 func handleErrorResponse(w http.ResponseWriter, err error) {
@@ -16,9 +19,21 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 }
 
 func getTweets(w http.ResponseWriter, r *http.Request) {
-	tracer := global.Tracer("notifications")
 	requestContext := r.Context()
-	_, rootSpan := tracer.Start(requestContext, "/notifications")
+	attrs, entries, spanCtx := otelhttptrace.Extract(requestContext, r)
+	if spanCtx.IsValid() {
+		requestContext = trace.ContextWithRemoteSpanContext(requestContext, spanCtx)
+	}
+	r = r.WithContext(baggage.ContextWithMap(requestContext, baggage.NewMap(baggage.MapUpdate{
+		MultiKV: entries,
+	})))
+	tracer := global.Tracer("tweets")
+	_, span := tracer.Start(
+		r.Context(),
+		"tweets",
+		trace.WithAttributes(attrs...),
+	)
+	defer span.End()
 
 	tweetsJSON, err := json.Marshal(tweets.GetTweets())
 	if err != nil {
@@ -26,5 +41,4 @@ func getTweets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, string(tweetsJSON))
-	rootSpan.End()
 }

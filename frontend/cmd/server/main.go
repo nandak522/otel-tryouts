@@ -10,6 +10,7 @@ import (
 	flag "github.com/spf13/pflag"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
+	// otel_newrelic "github.com/newrelic/opentelemetry-exporter-go/newrelic"
 )
 
 // StartTime gives the start time of server
@@ -18,6 +19,15 @@ import (
 // func uptime() string {
 // 	elapsedTime := time.Since(StartTime)
 // 	return fmt.Sprintf("%d:%d:%d", int(math.Round(elapsedTime.Hours())), int(math.Round(elapsedTime.Minutes())), int(math.Round(elapsedTime.Seconds())))
+// }
+
+// func initTracer() {
+// 	exporter, err := otel_newrelic.NewExporter("twitter-frontend", os.Getenv("NEWRELIC_LICENSE_KEY"))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	tp := trace.NewTracerProvider(trace.WithSyncer(exporter))
+// 	global.SetTracerProvider(tp)
 // }
 
 func main() {
@@ -40,6 +50,8 @@ func main() {
 	})
 
 	log.SetLevel(log.DebugLevel)
+	fn := initTracer()
+	defer fn()
 	log.Info("Running Frontend Service on ", port, "...")
 	newrelicLicenseKey, isEnvVarSet := os.LookupEnv("NEWRELIC_LICENSE_KEY")
 	if isEnvVarSet {

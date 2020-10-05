@@ -37,11 +37,12 @@ func main() {
 	})
 
 	log.SetLevel(log.DebugLevel)
-	serviceName := "twitter-frontend"
+	apmName := "twitter-frontend"
+	serviceName := "frontend"
 	fn := initTracer(serviceName)
 	defer fn()
 	log.Info("Running Frontend Service on ", port, "...")
-	path, handler := initAPM(serviceName)
+	path, handler := initAPM(apmName)
 	http.HandleFunc(path, handler)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 }

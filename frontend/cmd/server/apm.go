@@ -24,6 +24,6 @@ func initAPM(serviceName string) (string, func(http.ResponseWriter, *http.Reques
 		log.Info("Newrelic Monitoring is enabled. Posting to ", newrelicAPM, " APM")
 		return apm.WrapHandleFunc(app, "/", homepage)
 	}
-	log.Info("NEWRELIC_LICENSE_KEY env variable not found. Instrumentation is off. Moving on...")
+	log.Info("NEWRELIC_LICENSE_KEY env variable not found. APM Instrumentation is off. Moving on...")
 	return "/", homepage
 }

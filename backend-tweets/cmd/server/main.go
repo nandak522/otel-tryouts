@@ -29,6 +29,9 @@ func main() {
 	})
 
 	log.SetLevel(log.DebugLevel)
+	serviceName := "tweets"
+	fn := initTracer(serviceName)
+	defer fn()
 	log.Info("Running Tweets Service on ", port, "...")
 	http.HandleFunc("/", getTweets)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)

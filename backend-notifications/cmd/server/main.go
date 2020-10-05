@@ -29,6 +29,9 @@ func main() {
 	})
 
 	log.SetLevel(log.DebugLevel)
+	serviceName := "notifications"
+	fn := initTracer(serviceName)
+	defer fn()
 	log.Info("Running Notifications Service on ", port, "...")
 	http.HandleFunc("/", getNotifications)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)

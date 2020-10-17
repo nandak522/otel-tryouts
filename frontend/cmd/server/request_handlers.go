@@ -66,8 +66,8 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		notifications = makeExternalCall(&rootSpanContext, "http://localhost:8002", &wg)
 	}()
-	wg.Wait()
 	computeSomethingLocal(&rootSpanContext)
+	wg.Wait()
 
 	rootSpan.End()
 

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sync"
+	"time"
 
 	apm "github.com/newrelic/go-agent/v3/newrelic"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
@@ -37,6 +38,15 @@ func makeExternalCall(rootSpanContext *context.Context, url string, wg *sync.Wai
 	return string(body)
 }
 
+func computeSomethingLocal(rootSpanContext *context.Context) {
+	tracer := global.Tracer("local-compute")
+
+	_, trace := tracer.Start(*rootSpanContext, "compute-something")
+	time.Sleep(50 * time.Millisecond)
+
+	trace.End()
+}
+
 func homepage(w http.ResponseWriter, r *http.Request) {
 	txn := apm.FromContext(r.Context())
 	defer txn.End()
@@ -57,6 +67,7 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 		notifications = makeExternalCall(&rootSpanContext, "http://localhost:8002", &wg)
 	}()
 	wg.Wait()
+	computeSomethingLocal(&rootSpanContext)
 
 	rootSpan.End()
 

@@ -7,10 +7,12 @@ import (
 	"net/http"
 
 	"github.com/none-da/otel-tryouts/backend-notifications/pkg/notifications"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
-	"go.opentelemetry.io/otel/api/baggage"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel/propagators"
 )
 
 func handleErrorResponse(w http.ResponseWriter, err error) {
@@ -20,19 +22,19 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 
 func getNotifications(w http.ResponseWriter, r *http.Request) {
 	requestContext := r.Context()
-	attrs, entries, spanCtx := otelhttptrace.Extract(requestContext, r)
+	attrs, entries, spanCtx := otelhttptrace.Extract(requestContext, r, otelhttptrace.WithPropagators(otel.NewCompositeTextMapPropagator(propagators.TraceContext{}, propagators.Baggage{})))
+	log.Debug("notifications spanCtx.TraceID: ", spanCtx.TraceID)
 	if spanCtx.IsValid() {
 		requestContext = trace.ContextWithRemoteSpanContext(requestContext, spanCtx)
 	}
-	r = r.WithContext(baggage.ContextWithMap(requestContext, baggage.NewMap(baggage.MapUpdate{
-		MultiKV: entries,
-	})))
+	r = r.WithContext(otel.ContextWithBaggageValues(requestContext, entries...))
 	tracer := global.Tracer("notifications")
 	_, span := tracer.Start(
 		r.Context(),
 		"/",
 		trace.WithAttributes(attrs...),
 	)
+	log.Debug("notifications span.SpanContext().SpanID: ", span.SpanContext().SpanID)
 	defer span.End()
 
 	notificationsJSON, err := json.Marshal(notifications.GetNotifications())

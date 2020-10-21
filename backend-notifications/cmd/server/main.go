@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/newrelic/opentelemetry-exporter-go/newrelic"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
@@ -30,8 +31,18 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 	serviceName := "notifications"
-	fn := initTracer(serviceName)
-	defer fn()
+	// jaegerFn := initTracer(serviceName)
+	// defer jaegerFn()
+	// Assumes the NEW_RELIC_API_KEY environment variable contains your New
+	// Relic Insights insert API key. This will error if it does not.
+	// newrelicFn := initNewrelicTracer(serviceName)
+	// defer newrelicFn.Stop()
+	controller, err := newrelic.InstallNewPipeline(serviceName)
+	if err != nil {
+		panic(err)
+	}
+	defer controller.Stop()
+
 	log.Info("Running Notifications Service on ", port, "...")
 	http.HandleFunc("/", getNotifications)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)

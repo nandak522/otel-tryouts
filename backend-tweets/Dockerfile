@@ -19,12 +19,18 @@ COPY ./cmd /app/cmd/
 RUN mkdir -p /app/pkg
 COPY ./pkg /app/pkg/
 COPY go.* /app/
+ENV TZ=Asia/Kolkata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 RUN cd /app \
     && go build -a -o tweets-server /app/cmd/server
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
+COPY --from=builder /etc/localtime /etc/localtime
+COPY --from=builder /etc/timezone /etc/timezone
 WORKDIR /app
 USER ${USER}:${USER}
 COPY --from=builder /app/tweets-server .

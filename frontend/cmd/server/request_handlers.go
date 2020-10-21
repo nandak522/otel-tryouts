@@ -11,8 +11,11 @@ import (
 	"time"
 
 	apm "github.com/newrelic/go-agent/v3/newrelic"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/propagators"
 )
 
 func handleErrorResponse(w http.ResponseWriter, err error) {
@@ -23,17 +26,17 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 func makeExternalCall(rootSpanContext *context.Context, url string, wg *sync.WaitGroup) string {
 	defer wg.Done()
 	req, _ := http.NewRequest("GET", url, nil)
-	otelhttptrace.Inject(*rootSpanContext, req)
+	otelhttptrace.Inject(*rootSpanContext, req, otelhttptrace.WithPropagators(otel.NewCompositeTextMapPropagator(propagators.TraceContext{}, propagators.Baggage{})))
 	frontEndClient := http.DefaultClient
-	tweetsResponse, err := frontEndClient.Do(req)
+	externalCallResponse, err := frontEndClient.Do(req)
 	if err != nil {
-		fmt.Println("Error from Tweets Service")
+		fmt.Println("Error from External Service")
 	}
-	defer tweetsResponse.Body.Close()
+	defer externalCallResponse.Body.Close()
 
-	body, err := ioutil.ReadAll(tweetsResponse.Body)
+	body, err := ioutil.ReadAll(externalCallResponse.Body)
 	if err != nil {
-		fmt.Println("Error in reading tweetsResponse.Body")
+		fmt.Println("Error in reading externalCallResponse.Body")
 	}
 	return string(body)
 }
@@ -54,6 +57,8 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 	requestContext := r.Context()
 	tracer := global.Tracer("frontend")
 	rootSpanContext, rootSpan := tracer.Start(requestContext, "/homepage")
+	log.Debug("rootSpan TraceID: ", rootSpan.SpanContext().TraceID)
+	log.Debug("rootSpan SpanID: ", rootSpan.SpanContext().SpanID)
 
 	var tweets string
 	var notifications string

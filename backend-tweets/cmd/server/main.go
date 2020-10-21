@@ -31,12 +31,12 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 	serviceName := "tweets"
+
 	// jaegerFn := initTracer(serviceName)
 	// defer jaegerFn()
+
 	// Assumes the NEW_RELIC_API_KEY environment variable contains your New
 	// Relic Insights insert API key. This will error if it does not.
-	// newrelicFn := initNewrelicTracer(serviceName)
-	// defer newrelicFn.Stop()
 	controller, err := newrelic.InstallNewPipeline(serviceName)
 	if err != nil {
 		panic(err)

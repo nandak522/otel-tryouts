@@ -39,42 +39,17 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 	serviceName := "frontend"
+
 	// jaegerFn := initTracer(serviceName)
 	// defer jaegerFn()
+
 	// Assumes the NEW_RELIC_API_KEY environment variable contains your New
 	// Relic Insights insert API key. This will error if it does not.
-	// newrelicFn := initNewrelicTracer(serviceName)
-	// defer newrelicFn.Stop()
 	controller, err := newrelic.InstallNewPipeline(serviceName)
 	if err != nil {
 		panic(err)
 	}
 	defer controller.Stop()
-
-	// Assumes the NEW_RELIC_API_KEY environment variable contains your New
-	// Relic Insights insert API key. This will error if it does not.
-	// traceProvider, controller, err := newrelic.NewExportPipeline(
-	// 	serviceName,
-	// 	[]trace.TracerProviderOption{
-	// 		trace.WithConfig(trace.Config{
-	// 			// Conservative sampler.
-	// 			DefaultSampler: trace.ParentBased(trace.NeverSample()),
-	// 			// Reduce span events.
-	// 			MaxEventsPerSpan: 10,
-	// 		}),
-	// 	},
-	// 	[]push.Option{
-	// 		// Increase push frequency.
-	// 		push.WithPeriod(time.Second),
-	// 	},
-	// )
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer controller.Stop()
-
-	// global.SetTracerProvider(traceProvider)
-	// global.SetMeterProvider(controller.MeterProvider())
 
 	log.Info("Running Frontend Service on ", port, "...")
 	// apmName := "twitter-frontend"

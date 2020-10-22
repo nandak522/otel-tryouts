@@ -14,6 +14,9 @@ services:
       - backend-tweets
       - backend-notifications
     environment:
+      # Tracing/Insights Key
+      NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
+
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
       JAEGER_REPORTER_LOG_SPANS: "true"
 
@@ -30,6 +33,9 @@ services:
     # depends_on:
     #   - backend-tweets-mysql
     environment:
+      # Tracing/Insights Key
+      NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
+
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
       JAEGER_REPORTER_LOG_SPANS: "true"
 
@@ -61,6 +67,9 @@ services:
     # depends_on:
     #   - backend-notifications-mysql
     environment:
+      # Tracing/Insights Key
+      NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
+
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
       JAEGER_REPORTER_LOG_SPANS: "true"
 

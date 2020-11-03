@@ -14,7 +14,7 @@ services:
       - backend-tweets
       - backend-notifications
     environment:
-      # Tracing/Insights Key
+      # Tracing/Event Key
       NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
 
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
@@ -33,7 +33,7 @@ services:
     # depends_on:
     #   - backend-tweets-mysql
     environment:
-      # Tracing/Insights Key
+      # Tracing/Event Key
       NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
 
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
@@ -67,7 +67,7 @@ services:
     # depends_on:
     #   - backend-notifications-mysql
     environment:
-      # Tracing/Insights Key
+      # Tracing/Event Key
       NEW_RELIC_API_KEY: XYZZZZZZZZZZZZZZZZZZ
 
       JAEGER_COLLECTOR: http://127.0.0.1:14268/api/traces
